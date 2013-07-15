@@ -53,11 +53,11 @@ if __name__ == "__main__":
 		
 		# go through each image
 		for image in images:
-			if (image.getTag() == scriptParams["Control_Tag"]):
-				omeTiffImage = image.exportOmeTiff()
-				payload = {'file': omeTiffImage}
-				r = requests.post("http://192.168.205.10/post.php", files=payload)
-				print "Upload 1"
-		
+			for annotation in image.listAnnotations():
+				if isinstance(annotation, omero.gateway.TagAnnotationWrapper):
+					if (annotation.getValue() == scriptParams["Control_Tag"]):
+						omeTiffImage = image.exportOmeTiff()
+						payload = {'file': omeTiffImage}
+						r = requests.post("http://192.168.205.10/post.php", files=payload)
 	finally:
 		client.closeSession()
