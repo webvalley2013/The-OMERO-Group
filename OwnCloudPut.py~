@@ -59,10 +59,9 @@ if __name__ == "__main__":
 						omeTiffImage = image.exportOmeTiff()
 						payload = {'file': omeTiffImage}
 						r = requests.put("http://192.168.205.10/owncloud/remote.php/webdav/", files=payload)
-
 #f = open('/home/gabriele/prova16.tiff').read()
-#r = requests.delete(url='http://192.168.205.10/owncloud/files/webdav.php/filename', auth=('webvalley','webvalley'))
-#r = requests.put(url='http://192.168.205.10/owncloud/files/webdav.php/newfolder/filename', data=f, auth=('webvalley','webvalley'))
+#r = requests.delete(url='http://192.168.205.10/owncloud/files/webdav.php/newfolder', auth=('webvalley','webvalley'))
+#r = requests.put(url='http://192.168.205.10/owncloud/files/webdav.php/newfolder/empty', auth=('webvalley','webvalley'))
 #r = requests.request('DELETE',url='http://192.168.205.10/owncloud/files/webdav.php/newfolder', auth=('webvalley','webvalley'))
 
 	finally:
