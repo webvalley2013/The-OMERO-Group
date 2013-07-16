@@ -49,7 +49,7 @@ if __name__ == "__main__":
         # gather all images
         images = []
 
-        if (scriptParams["Data_Type"] == "Dataset"):
+        if scriptParams["Data_Type"] == "Dataset":
             for dataSet in objects:
                 images.extend(list(dataSet.listChildren()))
             if not images:
@@ -61,7 +61,7 @@ if __name__ == "__main__":
         for image in images:
             for annotation in image.listAnnotations():
                 if isinstance(annotation, omero.gateway.TagAnnotationWrapper):
-                    if (annotation.getValue() == scriptParams["Control_Tag"]):
+                    if annotation.getValue() == scriptParams["Control_Tag"]:
                         omeTiffImage = image.exportOmeTiff()
                         #payload = {'file': omeTiffImage}
                         r = requests.put(url='http://192.168.205.10/owncloud/files/webdav.php/OmeroTest/ImageTest.tiff',
