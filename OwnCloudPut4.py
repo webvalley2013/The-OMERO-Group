@@ -5,8 +5,8 @@ import omero                        # contains general OMERO content
 import omero.util.script_utils as scriptUtil        # used for making the user interface
 from omero.rtypes import *                # imports rstring + other data types
 import omero.scripts as scripts                # allows for making user interface
-from cStringIO import StringIO
 from numpy import *                    # for array representations
+import os
 
 try:
     from PIL import Image
@@ -15,6 +15,7 @@ except ImportError:
 import omero.clients
 from omero import client_wrapper
 import requests
+from wvutils.davloader import DAVLoader
 
 if __name__ == "__main__":
     dataTypes = [rstring('Dataset'), rstring('Image')]
@@ -57,18 +58,16 @@ if __name__ == "__main__":
         else:
             images = objects
 
+        loader = DAVLoader('http://192.168.205.10/owncloud/files/webdav.php/', 'webvalley', 'webvalley')
+
         # go through each image
         for image in images:
             for annotation in image.listAnnotations():
                 if isinstance(annotation, omero.gateway.TagAnnotationWrapper):
                     if annotation.getValue() == scriptParams["Control_Tag"]:
                         omeTiffImage = image.exportOmeTiff()
-                        #payload = {'file': omeTiffImage}
-                        r = requests.put(url='http://192.168.205.10/owncloud/files/webdav.php/OmeroTest/ImageTest.tiff',
-                                         data=omeTiffImage, auth=('webvalley', 'webvalley'))
-                    #omeTiffImage = image.exportOmeTiff()
-                    #payload = {'file': omeTiffImage}
-                    #r = requests.put("http://192.168.205.10/owncloud/remote.php/webdav/", files=payload)
+                        loader.mkdir('asdasdfsad')
+                        loader.upload('asdasdfsad/'+os.path.basename(image.getName()), omeTiffImage)
     finally:
         client.closeSession()
 
