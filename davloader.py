@@ -1,7 +1,7 @@
 __author__ = 'The webvalley Team (Omero group division)'
 from requests import Request, Session
 from lxml import etree
-import utils
+import xmlutils
 import requests
 
 
@@ -56,7 +56,7 @@ class DAVLoader(object):
         data = '<?xml version="1.0"?><a:propfind xmlns:a="DAV:"><a:allprop/></a:propfind>'
         xml = self.__retrieve('PROPFIND', data, path, [200, 207])
         parser = etree.XMLParser(remove_blank_text=True)
-        tree = utils.clear_xml_comments(utils.clear_xml_namespaces(etree.XML(xml, parser)))
+        tree = xmlutils.clear_xml_comments(xmlutils.clear_xml_namespaces(etree.XML(xml, parser)))
         files = []
         dirs = []
         for response in tree.findall('response'):
