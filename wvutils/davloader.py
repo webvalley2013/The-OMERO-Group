@@ -1,7 +1,7 @@
 __author__ = 'The webvalley Team (Omero group division)'
 from requests import Request, Session
 from lxml import etree
-import xmlutils
+from wvutils import xmlutils
 import requests
 
 

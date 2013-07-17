@@ -14,7 +14,6 @@ except ImportError:
     import Image
 import omero.clients
 from omero import client_wrapper
-import requests
 from wvutils.davloader import DAVLoader
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 import os
 import io
-
 from lxml import etree
 
 XSLT_STRIP_NAMESPACES="""
