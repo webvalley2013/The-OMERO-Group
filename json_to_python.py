@@ -9,8 +9,8 @@ import requests
 
 data = requests.get("http://192.168.205.10/pl.json")
 jsonloaded = data.json()
-"""for x in jsonloaded:  ###Used for printing the required data in an ordered list
-	print x"""
+for x in jsonloaded:  ###Used for printing the required data in an 
+	print x
 
 def runScript():
   client = scripts.client('1_json_python.py', """With this script, you can convert Json files into Python dictionaries.
@@ -20,9 +20,6 @@ def runScript():
 	institutions = ["WebValley"],
 	contact = "webvalley@fbk.eu",)
 	conn = BlitzGateway(client_obj=client)
-
-
-	print jsonloaded
 
 	client.closeSession()
 
