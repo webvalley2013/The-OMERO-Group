@@ -5,7 +5,6 @@ import omero                        # contains general OMERO content
 import omero.util.script_utils as scriptUtil        # used for making the user interface
 from omero.rtypes import *                # imports rstring + other data types
 import omero.scripts as scripts                # allows for making user interface
-from cStringIO import StringIO
 from numpy import *                    # for array representations
 
 try:
