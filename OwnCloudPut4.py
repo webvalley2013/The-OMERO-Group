@@ -69,10 +69,3 @@ if __name__ == "__main__":
                         loader.upload('asdasdfsad/'+os.path.basename(image.getName()), omeTiffImage)
     finally:
         client.closeSession()
-
-
-#f = open('/home/gabriele/prova16.tiff').read()
-#r = requests.delete(url='http://192.168.205.10/owncloud/files/webdav.php/filename', auth=('webvalley','webvalley'))
-#r = requests.put(url='http://192.168.205.10/owncloud/files/webdav.php/newfolder/filename', data=f, auth=('webvalley','webvalley'))
-#r = requests.request('DELETE',url='http://192.168.205.10/owncloud/files/webdav.php/newfolder', auth=('webvalley','webvalley'))
-
