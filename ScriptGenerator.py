@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-#from omero.gateway import BlitzGateway        # used for connecting to the server
-#import omero                                # contains general OMERO content
-#import omero.util.script_utils as scriptUtil# used for making the user interface
-#from omero.rtypes import *                    # imports rstring + other data types
 import omero.scripts as scripts                # allows for making user interface
 from wvutils.scripts_manager import ScriptsManager
 
@@ -11,15 +7,20 @@ try:
     from PIL import Image
 except ImportError:
     import Image
-#import omero.clients
-#from omero import client_wrapper
 import requests
 
 #urls
-url_process_details = "http://192.168.205.13/process/detail/"
-url_process_list = "http://192.168.205.13/process/list/"
-url_process_run = "http://192.168.205.13/process/run/"
-server_path = "http://192.168.205.13"
+server_url = "http://192.168.205.13"  # url of the analysis server
+url_process_list = server_url+"/process/list/"  # url for retriving process list
+url_process_details = server_url+"/process/detail/"  # url for process details (inputs and ouputs definitions)
+url_process_run = server_url+"/process/run/"  # url for running processes
+
+# webdav url for image uploading
+webdav_url = "http://192.168.205.10/owncloud/files/webdav.php/inputs/"
+
+# base url for uploaded images (this will be sent to analysis server)
+public_webdav_url = "http://192.168.205.10/owncloud/public.php?service=files&download&t=480d93ee44956ac9e26efc1d3321449e&path=/"
+
 
 def simple_input(type, identifier, group_num, description):
     """Builds a generic input () string."""
@@ -30,6 +31,7 @@ def simple_input(type, identifier, group_num, description):
                                         description="{3}"),
 """.format(type, identifier, group_num, description)
     return s
+
 
 def build_inputs(inputs_json):
     s = ""
@@ -55,26 +57,28 @@ def build_inputs(inputs_json):
         group_num += 1
     return s
 
+
 def build_image_upload(json):
     s = ""
     for input in json:
-        if input["type"]=="url_list":
+        if input["type"] == "url_list":
             s += """\
                     if annotation.getValue() == scriptParams["{0}"]:
                         omeTiffImage = image.exportOmeTiff()
                         loader.upload(url, omeTiffImage)
-                        urls["{1}"] = urls.get("{1}","")+"||"+loaderout+url
+                        urls["{1}"] = urls.get("{1}","")+urllib.quote(loaderout+url,":/")+"||"
 
 """.format(input["label"],
            input["name"])
     return s
 
+
 def build_data(json):
     s = ""
     for input in json:
-        if input["type"]=="url_list":
+        if input["type"] == "url_list":
             s += """\
-        data["{0}"] = urls.get("{0}", "")
+        data["{0}"] = urls.get("{0}", "")[:-2]
 """.format(input["name"])
         else:
             s += """\
@@ -82,22 +86,23 @@ def build_data(json):
 """.format(input["name"], input["label"])
     return s
 
+
 if __name__ == "__main__":
     client = scripts.client("WebValley Processing",
                             "This code enables for the creation of processing scripts.",
                             version="0.1",
-                            authors=["The OMERO Group", ""],
-                            institutions=["WebValley"],
+                            authors=["WebvalleyTeam 2013"],
+                            institutions=["FBK"],
                             contact="webvalley@fbk.eu", )
 
     availableProcesses = requests.get(url_process_list).json()
 
     for process in availableProcesses:
-        jsonData = requests.get(url_process_details+str(process["id"])).json()
+        jsonData = requests.get(url_process_details + str(process["id"])).json()
 
         url_list_needed = False
         for input in jsonData["inputs"]:
-            if input["type"]=="url_list":
+            if input["type"] == "url_list":
                 url_list_needed = True
 
         if url_list_needed:
@@ -155,6 +160,7 @@ import os
 import random
 import string
 import requests
+import urllib
 
 try:
     from PIL import Image
@@ -165,8 +171,8 @@ from omero import client_wrapper
 from wvutils.davloader import DAVLoader
 from time import sleep
 
-loaderout = "http://192.168.205.10/owncloud/public.php?service=files&download&t=480d93ee44956ac9e26efc1d3321449e&path=/"
-loaderin  = "http://192.168.205.10/owncloud/files/webdav.php/inputs/"
+loaderout = "{public_webdav_url}"
+loaderin  = "{webdav_url}"
 
 if __name__ == "__main__":
 
@@ -198,11 +204,11 @@ if __name__ == "__main__":
 
         response = requests.post("{url_process_run}",data=data).json()
 
-        if response["success"] == "true":
+        if response["success"]:
             polling_url =response["polling_url"]
             running = True
             while running:
-                status = requests.get("{server_path}"+polling_url).json()
+                status = requests.get("{server_url}"+polling_url).json()
                 running = not status["finished"]
                 sleep(5)
             if status["status"] == "SUCCESS":
@@ -223,8 +229,11 @@ if __name__ == "__main__":
            author=jsonData["author"],
            image_upload=build_image_upload(jsonData["inputs"]),
            build_data=build_data(jsonData["inputs"]),
-           url_process_run=url_process_run+process["code"]+"/"+str(process["id"]),
-           server_path=server_path) #TODO check this
+           url_process_run=url_process_run + process["code"] + "/" + str(process["id"]),
+           server_url=server_url,
+           webdav_url=webdav_url,
+           public_webdav_url=public_webdav_url
+        )
 
         sm = ScriptsManager()
-        sm.upload("/analysis/",process["code"],finalCode)
+        sm.upload("/analysis/", process["code"], finalCode)
