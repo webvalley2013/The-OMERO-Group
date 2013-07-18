@@ -22,14 +22,14 @@ webdav_url = "http://192.168.205.10/owncloud/files/webdav.php/inputs/"
 public_webdav_url = "http://192.168.205.10/owncloud/public.php?service=files&download&t=480d93ee44956ac9e26efc1d3321449e&path=/"
 
 
-def simple_input(type, identifier, group_num, description):
+def simple_input(type, identifier, group_num, description, optional):
     """Builds a generic input () string."""
     s = """\
                             scripts.{0}("{1}", #input identifier
-                                        optional=False,
+                                        optional={4},
                                         grouping="{2}",
                                         description="{3}"),
-""".format(type, identifier, group_num, description)
+""".format(type, identifier, group_num, description, optional)
     return s
 
 
@@ -41,17 +41,20 @@ def build_inputs(inputs_json):
             s += simple_input("String",
                               input["label"],
                               group_num,
-                              input["description"])
+                              input["description"],
+                              str(not input["required"]))
         elif input["type"] == "string":
             s += simple_input("String",
                               input["label"],
                               group_num,
-                              input["description"])
+                              input["description"],
+                              str(not input["required"]))
         elif input["type"] == "int":
             s += simple_input("Int",
                               input["label"],
                               group_num,
-                              input["description"])
+                              input["description"],
+                              str(not input["required"]))
         else:
             raise RuntimeError("Input type <{0}> not recognized".format(input["type"]))
         group_num += 1
@@ -82,7 +85,7 @@ def build_data(json):
 """.format(input["name"])
         else:
             s += """\
-        data["{0}"] = scriptParams["{1}"]
+        data["{0}"] = scriptParams.get("{1}","")
 """.format(input["name"], input["label"])
     return s
 
