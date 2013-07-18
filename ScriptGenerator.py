@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import omero.scripts as scripts                # allows for making user interface
+import omero.scripts as scripts
 from wvutils.scripts_manager import ScriptsManager
 
 try:
@@ -90,10 +90,17 @@ def build_data(json):
 if __name__ == "__main__":
     client = scripts.client("WebValley Processing",
                             "This code enables for the creation of processing scripts.",
+                            scripts.String("Folder Name", grouping="1",
+                                           description="Folder Name where analysis scripts will be created"),
                             version="0.1",
                             authors=["WebvalleyTeam 2013"],
                             institutions=["FBK"],
-                            contact="webvalley@fbk.eu", )
+                            contact="webvalley@fbk.eu")
+
+    scriptParams = {}
+    for key in client.getInputKeys():
+        if client.getInput(key):
+            scriptParams[key] = client.getInput(key, unwrap=True)
 
     availableProcesses = requests.get(url_process_list).json()
 
@@ -236,4 +243,4 @@ if __name__ == "__main__":
         )
 
         sm = ScriptsManager()
-        sm.upload("/analysis/", process["code"], finalCode)
+        sm.upload("/"+scriptParams["Folder Name"]+"/", process["code"], finalCode)
