@@ -69,7 +69,7 @@ def build_image_upload(json):
                     if annotation.getValue() == scriptParams["{0}"]:
                         omeTiffImage = image.exportOmeTiff()
                         loader.upload(url, omeTiffImage)
-                        urls["{1}"] = urls.get("{1}","")+urllib.quote(loaderout+url,":/")+"||"
+                        urls["{1}"] = urls.get("{1}","")+urllib.quote(loaderout+url,":/=?&")+"||"
 
 """.format(input["label"],
            input["name"])
